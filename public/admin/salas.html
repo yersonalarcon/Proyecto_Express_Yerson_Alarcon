@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cine Acme - Gestión de Salas</title>
+    <link rel="stylesheet" href="/public/css/estilos.salas.css" />
+    <!-- SweetAlert2 para mensajes -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+      /* Estilos de la tabla */
+      #roomsTable {
+        display: table !important;
+        width: 100%;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 8px;
+        overflow: hidden;
+        margin-top: 20px;
+      }
+      #roomsTable th {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        padding: 15px;
+        text-align: left;
+      }
+      #roomsTable td {
+        padding: 12px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        color: white;
+      }
+      #loading {
+        color: white;
+        font-size: 18px;
+        padding: 20px;
+        text-align: center;
+      }
+
+      /* Estilos del modal */
+      .modal {
+        display: none;
+        position: fixed;
+        z-index: 9999;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        overflow: auto;
+      }
+      .modal-content {
+        background: var(--bg-dark);
+        margin: 8% auto;
+        padding: 20px;
+        border-radius: 10px;
+        width: 400px;
+        color: white;
+        position: relative;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.6);
+      }
+      .close {
+        position: absolute;
+        top: 10px;
+        right: 15px;
+        font-size: 22px;
+        font-weight: bold;
+        cursor: pointer;
+        color: #fff;
+      }
+      .cta-button {
+        background: #6c3bd3;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 8px;
+        cursor: pointer;
+        color: white;
+        margin-top: 10px;
+      }
+
+      /* Estilos de los botones de acción en la tabla */
+      .action-button {
+        padding: 8px 12px;
+        border-radius: 6px;
+        cursor: pointer;
+        color: white;
+        border: none;
+        font-size: 14px;
+        transition: transform 0.2s, background-color 0.2s;
+      }
+      .edit-button {
+        background-color:var(--primary-color);; /* Verde */
+      }
+      .edit-button:hover {
+        background-color: #2f855a;
+        transform: translateY(-2px);
+      }
+      .delete-button {
+        background-color: #e53e3e; /* Rojo */
+      }
+      .delete-button:hover {
+        background-color: #c53030;
+        transform: translateY(-2px);
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="header-container">
+        <h1>Cine Acme</h1>
+        <div class="user-menu">
+          <span id="userWelcome">Bienvenido</span>
+          <button id="logoutBtn" class="logout-button">Cerrar Sesión</button>
+        </div>
+        <nav>
+          <ul class="nav-menu">
+            <li><a href="index.html" class="nav-item">Inicio</a></li>
+            <li><a href="usuarios.html" class="nav-item">Usuarios</a></li>
+            <li><a href="cines.html" class="nav-item">Cines</a></li>
+            <li><a href="salas.html" class="nav-item active">Salas</a></li>
+            <li><a href="peliculas.html" class="nav-item">Películas</a></li>
+            <li><a href="funciones.html" class="nav-item">Funciones</a></li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <!-- Modal para crear/editar sala -->
+    <div id="roomModal" class="modal">
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <h3 id="modalTitle">Crear Nueva Sala</h3>
+        <form id="roomForm">
+          <input type="hidden" id="roomId" />
+          <div class="form-group">
+            <label for="code">Código:</label>
+            <input type="text" id="code" name="code" required />
+          </div>
+          <div class="form-group">
+            <label for="numSeats">Número de Sillas:</label>
+            <input
+              type="number"
+              id="numSeats"
+              name="numSeats"
+              min="1"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label for="cinemaId">Cine:</label>
+            <select id="cinemaId" name="cinemaId" required>
+              <option value="">Seleccionar cine...</option>
+            </select>
+          </div>
+          <button type="submit" class="cta-button">Guardar</button>
+        </form>
+      </div>
+    </div>
+
+    <main>
+         <div class="gif-container">
+            <!-- GIF de fondo -->
+            <img src="/public/videos/mundo.gif" alt="Fondo animado de cine" class="gif-background">
+        </div>
+      <div class="main-content">
+        <h2>Gestión de Salas</h2>
+        <div class="actions">
+          <button id="createRoomBtn" class="cta-button">
+            Crear Nueva Sala
+          </button>
+          <select id="cinemaFilter">
+            <option value="">Todos los cines</option>
+          </select>
+        </div>
+        <div class="loading" id="loading">Cargando salas...</div>
+        <table class="data-table" id="roomsTable" style="display: none">
+          <thead>
+            <tr>
+              <th>Código</th>
+              <th>Sillas</th>
+              <th>Cine</th>
+              <th>Ciudad</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="roomsBody"></tbody>
+        </table>
+      </div>
+    </main>
+<script src="/public/js/salas.js"></script>>
+
+  </body>
+</html>

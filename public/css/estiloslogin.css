@@ -1,0 +1,254 @@
+   /* Estilos generales */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background-color: #0f172a;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #fff;
+            overflow-x: hidden;
+            /* Se evita el desplazamiento vertical para que la página permanezca fija */
+            overflow-y: hidden;
+            height: 100vh; /* Se añade esta propiedad para que el cuerpo se ajuste a la altura total de la ventana */
+        }
+
+        /* Contenido principal con GIF de fondo */
+        main {
+            width: 100%;
+            margin: 0 auto;
+            flex-grow: 1;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem 1rem;
+            z-index: 2; /* Asegura que el contenido esté sobre el video */
+        }
+
+        .gif-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .gif-background {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            min-width: 100%;
+            min-height: 100%;
+            width: auto;
+            height: auto;
+            object-fit: cover;
+            opacity: 0.25;
+        }
+
+        /* Asegurar que el gif no exceda el viewport en dispositivos móviles */
+        @media (max-aspect-ratio: 16/9) {
+            .gif-background {
+                width: auto;
+                height: 100%;
+            }
+        }
+
+        @media (min-aspect-ratio: 16/9) {
+            .gif-background {
+                width: 100%;
+                height: auto;
+            }
+        }
+
+        .main-content {
+            position: relative;
+            z-index: 3; /* Z-index más alto para asegurar la visibilidad del contenido */
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        /* Título de la página */
+        .page-title {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 2rem;
+            color: #ffffff;
+            text-shadow: 0 0 10px rgba(0, 0, 0, 0.6);
+            text-align: center;
+        }
+
+        .main-section {
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 3rem 2rem;
+            border-radius: 12px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            max-width: 700px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 1s ease-out forwards;
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .main-section h2 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, #4c51bf, #667eea);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .main-section p {
+            color: #4b5563;
+            font-size: 1.2rem;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #4c51bf, #667eea);
+            color: white;
+            padding: 12px 28px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            border: none;
+            cursor: pointer;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+
+        /* Footer */
+        footer {
+            background-color: rgba(31, 41, 55, 0.9);
+            color: white;
+            padding: 1.5rem 0;
+            position: relative;
+            z-index: 10;
+        }
+
+        .footer-container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+            text-align: center;
+        }
+
+        footer p {
+            font-size: 1rem;
+            margin: 0;
+        }
+
+        /* Formulario de Login */
+        .login-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            text-align: left;
+            width: 100%;
+            color: #374151; /* Color de texto del formulario */
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .form-group input {
+            padding: 0.75rem 1rem;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            width: 100%;
+            color: #1f2937;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #4c51bf;
+            box-shadow: 0 0 0 3px rgba(76, 81, 191, 0.3);
+        }
+
+        /* Estilo para el mensaje de registro */
+        .register-message {
+            margin-top: 1rem;
+            text-align: center;
+            color: #4b5563;
+        }
+        
+        .register-link {
+            color: #4c51bf;
+            font-weight: 600;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .register-link:hover {
+            text-decoration: underline;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .page-title {
+                font-size: 2rem;
+            }
+            .main-section {
+                padding: 2rem 1.5rem;
+                margin: 0 1rem;
+            }
+            
+            .main-section h2 {
+                font-size: 1.8rem;
+            }
+            
+            /* Ajustes específicos para móviles */
+            .gif-background {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+        }

@@ -1,3 +1,4 @@
+// src/models/user.model.js
 import { ObjectId } from "mongodb";
 
 class User {
@@ -33,6 +34,17 @@ class User {
             return user;
         } catch (err) {
             console.error("Error al buscar usuario:", err);
+            return null;
+        }
+    }
+    
+    // Método para buscar por ID
+    async getById(id) {
+        try {
+            const user = await this.#collection.findOne({ _id: new ObjectId(id) });
+            return user;
+        } catch (err) {
+            console.error("Error al buscar usuario por ID:", err);
             return null;
         }
     }

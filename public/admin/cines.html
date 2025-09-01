@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cine Acme - Gestión de Cines</title>
+    <!-- Incluir la fuente Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/public/css/estilo.cines.css">
+
+</head>
+<body>
+    <!-- Header y Navegación -->
+    <header>
+        <div class="header-container">
+            <h1>Cine Acme</h1>
+            <div class="user-menu">
+                <span id="userWelcome">Bienvenido</span>
+                <button id="logoutBtn" class="logout-button">Cerrar Sesión</button>
+            </div>
+            <nav>
+                <ul class="nav-menu">
+                    <li><a href="index.html" class="nav-item">Inicio</a></li>
+                    <li><a href="usuarios.html" class="nav-item">Usuarios</a></li>
+                    <li><a href="cines.html" class="nav-item active">Cines</a></li>
+                    <li><a href="salas.html" class="nav-item">Salas</a></li>
+                    <li><a href="peliculas.html" class="nav-item">Películas</a></li>
+                    <li><a href="funciones.html" class="nav-item">Funciones</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Modal para crear/editar cines -->
+    <div id="cinemaModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3 id="modalTitle">Crear Nuevo Cine</h3>
+            <form id="cinemaForm">
+                <input type="hidden" id="cinemaId">
+                
+                <div class="form-group">
+                    <label for="code">Código:</label>
+                    <input type="text" id="code" name="code" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="name">Nombre:</label>
+                    <input type="text" id="name" name="name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="address">Dirección:</label>
+                    <input type="text" id="address" name="address" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="city">Ciudad:</label>
+                    <input type="text" id="city" name="city" required>
+                </div>
+                
+                <button type="submit" class="cta-button">Guardar</button>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Modal de Mensajes y Confirmaciones -->
+    <div id="messageModal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="messageCloseBtn">&times;</span>
+            <h3 id="messageTitle"></h3>
+            <p id="messageText"></p>
+            <div class="modal-actions">
+                <button class="cta-button confirm-btn" id="confirmBtn" style="display: none;">Aceptar</button>
+                <button class="cta-button cancel-btn" id="cancelBtn" style="display: none;">Cancelar</button>
+                <button class="cta-button ok-btn" id="okBtn" style="display: none;">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contenido principal -->
+    <main>
+        <div class="gif-container">
+            <!-- GIF de fondo -->
+            <img src="/public/videos/mundo.gif" alt="Fondo animado de cine" class="gif-background">
+        </div>
+        
+        <div class="main-content">
+            <section class="main-section">
+                <h2>Gestión de Cines</h2>
+                
+                <div class="actions">
+                    <button id="createCinemaBtn" class="cta-button">Crear Nuevo Cine</button>
+                </div>
+
+                <div class="loading" id="loading">Cargando cines...</div>
+                <div class="error-message" id="errorMessage" style="display: none;"></div>
+
+                <table class="data-table" id="cinemasTable" style="display: none;">
+                    <thead>
+                        <tr>
+                            <th>Código</th>
+                            <th>Nombre</th>
+                            <th>Dirección</th>
+                            <th>Ciudad</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="cinemasBody">
+                        <!-- Los datos se cargarán dinámicamente -->
+                    </tbody>
+                </table>
+            </section>
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-container">
+            <p>&copy; 2025 Cine Acme. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Variables globales
+        let cinemas = [];
+        const API_BASE = 'http://localhost:3000/cinemas';
+        const token = localStorage.getItem('authToken');
+
+        // Elementos DOM
+        const cinemasTable = document.getElementById('cinemasTable');
+        const cinemasBody = document.getElementById('cinemasBody');
+        const loading = document.getElementById('loading');
+        const errorMessage = document.getElementById('errorMessage');
+        const modal = document.getElementById('cinemaModal');
+        const cinemaForm = document.getElementById('cinemaForm');
+        const modalTitle = document.getElementById('modalTitle');
+        const createCinemaBtn = document.getElementById('createCinemaBtn');
+        const closeModal = document.querySelector('.close');
+
+        // Nuevos elementos para el modal de mensajes/confirmaciones
+        const messageModal = document.getElementById('messageModal');
+        const messageTitle = document.getElementById('messageTitle');
+        const messageText = document.getElementById('messageText');
+        const messageCloseBtn = document.getElementById('messageCloseBtn');
+        const okBtn = document.getElementById('okBtn');
+        const confirmBtn = document.getElementById('confirmBtn');
+        const cancelBtn = document.getElementById('cancelBtn');
+
+        // Verificar autenticación
+        if (!token) {
+            showMessageModal('Error de Sesión', '⚠️ Debes iniciar sesión primero');
+            setTimeout(() => {
+                window.location.href = 'login.html';
+            }, 2000);
+        }
+
+        // Event Listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            loadCinemas();
+            setupUserMenu();
+        });
+
+        createCinemaBtn.addEventListener('click', () => openModal());
+        closeModal.addEventListener('click', () => closeModalWindow());
+        cinemaForm.addEventListener('submit', handleFormSubmit);
+
+        // Funciones para los modales personalizados
+        function showMessageModal(title, message, isConfirm = false, onConfirm = null) {
+            messageTitle.textContent = title;
+            messageText.textContent = message;
+            messageModal.style.display = 'flex';
+            
+            // Ocultar todos los botones por defecto
+            okBtn.style.display = 'none';
+            confirmBtn.style.display = 'none';
+            cancelBtn.style.display = 'none';
+            messageCloseBtn.style.display = 'block';
+
+            if (isConfirm) {
+                confirmBtn.style.display = 'inline-block';
+                cancelBtn.style.display = 'inline-block';
+                // Clonar para evitar múltiples listeners
+                const newConfirmBtn = confirmBtn.cloneNode(true);
+                confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
+                newConfirmBtn.addEventListener('click', () => {
+                    messageModal.style.display = 'none';
+                    if (onConfirm) onConfirm();
+                });
+
+                const newCancelBtn = cancelBtn.cloneNode(true);
+                cancelBtn.parentNode.replaceChild(newCancelBtn, cancelBtn);
+                newCancelBtn.addEventListener('click', () => {
+                    messageModal.style.display = 'none';
+                });
+            } else {
+                okBtn.style.display = 'inline-block';
+                const newOkBtn = okBtn.cloneNode(true);
+                okBtn.parentNode.replaceChild(newOkBtn, okBtn);
+                newOkBtn.addEventListener('click', () => {
+                    messageModal.style.display = 'none';
+                });
+            }
+        }
+
+        function setupUserMenu() {
+            const userEmail = localStorage.getItem('userEmail');
+            if (userEmail) {
+                document.getElementById('userWelcome').textContent = `Bienvenido, ${userEmail}`;
+            }
+
+            document.getElementById('logoutBtn').addEventListener('click', function() {
+                showMessageModal('Confirmar Cierre de Sesión', '¿Estás seguro de que quieres cerrar sesión?', true, () => {
+                    localStorage.removeItem('authToken');
+                    localStorage.removeItem('userEmail');
+                    localStorage.removeItem('userRole');
+                    window.location.href = 'login.html';
+                });
+            });
+        }
+
+        async function loadCinemas() {
+            try {
+                showLoading();
+                const response = await fetch(API_BASE, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+        
+                if (!response.ok) {
+                    if (response.status === 401) {
+                        handleUnauthorized();
+                        return;
+                    }
+                    throw new Error('Error al cargar cines');
+                }
+        
+                cinemas = await response.json();
+                renderCinemas();
+                
+            } catch (error) {
+                showError('Error al cargar cines: ' + error.message);
+            }
+        }
+        
+        function renderCinemas() {
+            cinemasBody.innerHTML = '';
+            
+            if (cinemas.length === 0) {
+                showError('No hay cines registrados');
+                return;
+            }
+        
+            cinemas.forEach(cinema => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${cinema.code}</td>
+                    <td>${cinema.name}</td>
+                    <td>${cinema.address}</td>
+                    <td>${cinema.city}</td>
+                    <td>
+                        <button class="action-button edit-button" onclick="editCinema('${cinema._id}')">Editar</button>
+                        <button class="action-button delete-button" onclick="deleteCinema('${cinema._id}')">Eliminar</button>
+                    </td>
+                `;
+                cinemasBody.appendChild(row);
+            });
+        
+            hideLoading();
+            cinemasTable.style.display = 'table';
+        }
+        
+        function openModal(cinema = null) {
+            if (cinema) {
+                modalTitle.textContent = 'Editar Cine';
+                document.getElementById('cinemaId').value = cinema._id;
+                document.getElementById('code').value = cinema.code;
+                document.getElementById('name').value = cinema.name;
+                document.getElementById('address').value = cinema.address;
+                document.getElementById('city').value = cinema.city;
+            } else {
+                modalTitle.textContent = 'Crear Nuevo Cine';
+                cinemaForm.reset();
+            }
+            modal.style.display = 'flex';
+        }
+        
+        function closeModalWindow() {
+            modal.style.display = 'none';
+            cinemaForm.reset();
+        }
+        
+        async function handleFormSubmit(e) {
+            e.preventDefault();
+            
+            const cinemaId = document.getElementById('cinemaId').value;
+            const formData = {
+                code: document.getElementById('code').value,
+                name: document.getElementById('name').value,
+                address: document.getElementById('address').value,
+                city: document.getElementById('city').value
+            };
+        
+            try {
+                const url = cinemaId ? `${API_BASE}/${cinemaId}` : API_BASE;
+                const method = cinemaId ? 'PUT' : 'POST';
+        
+                const response = await fetch(url, {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(formData)
+                });
+        
+                const result = await response.json();
+        
+                if (!response.ok) {
+                    throw new Error(result.message || 'Error al guardar');
+                }
+        
+                showMessageModal('¡Éxito!', cinemaId ? '✅ Cine actualizado correctamente.' : '✅ Cine creado correctamente.');
+                closeModalWindow();
+                loadCinemas();
+        
+            } catch (error) {
+                showMessageModal('¡Error!', '❌ ' + error.message);
+            }
+        }
+        
+        function editCinema(id) {
+            const cinema = cinemas.find(c => c._id === id);
+            if (cinema) {
+                openModal(cinema);
+            }
+        }
+        
+        async function deleteCinema(id) {
+            showMessageModal('Confirmar Eliminación', '¿Estás seguro de que quieres eliminar este cine?', true, async () => {
+                try {
+                    const response = await fetch(`${API_BASE}/${id}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+        
+                    const result = await response.json();
+        
+                    if (!response.ok) {
+                        throw new Error(result.message || 'Error al eliminar');
+                    }
+        
+                    showMessageModal('¡Éxito!', '✅ Cine eliminado correctamente.');
+                    loadCinemas();
+        
+                } catch (error) {
+                    showMessageModal('¡Error!', '❌ ' + error.message);
+                }
+            });
+        }
+        
+        function handleUnauthorized() {
+            localStorage.removeItem('authToken');
+            localStorage.removeItem('userEmail');
+            localStorage.removeItem('userRole');
+            showMessageModal('Sesión Expirada', '⚠️ Sesión expirada. Por favor, inicia sesión nuevamente.');
+            setTimeout(() => {
+                window.location.href = 'login.html';
+            }, 2000);
+        }
+        
+        function showLoading() {
+            loading.style.display = 'block';
+            cinemasTable.style.display = 'none';
+            errorMessage.style.display = 'none';
+        }
+        
+        function hideLoading() {
+            loading.style.display = 'none';
+        }
+        
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.style.display = 'block';
+            loading.style.display = 'none';
+            cinemasTable.style.display = 'none';
+        }
+        
+        // Cerrar modales al hacer clic fuera
+        window.addEventListener('click', function(event) {
+            if (event.target === modal) {
+                closeModalWindow();
+            }
+            if (event.target === messageModal) {
+                messageModal.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cine Acme - Panel de Administración</title>
+    <link rel="stylesheet" href="/public/css/estilos.css">
+</head>
+<body>
+    <!-- Header y Navegación -->
+    <header>
+        <div class="header-container">
+            <!-- Título del sitio -->
+            <h1>Cine Acme</h1>
+            
+            <!-- Menú de usuario y logout -->
+            <div class="user-menu">
+                <span id="userWelcome">Bienvenido</span>
+                <button id="logoutBtn" class="logout-button">Cerrar Sesión</button>
+            </div>
+
+            <!-- Menú de navegación -->
+            <nav>
+                <ul class="nav-menu">
+                    <li><a href="index.html" class="nav-item">Inicio</a></li>
+                    <li><a href="usuarios.html" class="nav-item">Usuarios</a></li>
+                    <li><a href="cines.html" class="nav-item">Cines</a></li>
+                    <li><a href="salas.html" class="nav-item">Salas</a></li>
+                    <li><a href="peliculas.html" class="nav-item">Películas</a></li>
+                    <li><a href="funciones.html" class="nav-item">Funciones</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Contenido principal con GIF de fondo -->
+    <main>
+        <div class="gif-container">
+            <!-- GIF de fondo -->
+            <img src="/public/videos/mundo.gif" alt="Fondo animado de cine" class="gif-background">
+        </div>
+        
+        <div class="main-content">
+            <section class="main-section">
+                <h2>Bienvenido al Panel de Administración</h2>
+                <p>
+                    Utiliza la barra de navegación para gestionar las sucursales, salas, películas y funciones de Cine Acme.
+                </p>
+            </section>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-container">
+            <p>&copy; 2025 Cine Acme. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <!-- Script de autenticación -->
+    <script>
+        // Verificar autenticación al cargar
+        document.addEventListener('DOMContentLoaded', function() {
+            const token = localStorage.getItem('authToken');
+            const userEmail = localStorage.getItem('userEmail');
+            const userRole = localStorage.getItem('userRole');
+            
+            if (!token) {
+                // Si no hay token, redirigir al login
+                alert('⚠️ Debes iniciar sesión primero');
+                window.location.href = 'login.html';
+                return;
+            }
+
+            // Mostrar información del usuario
+            if (userEmail) {
+                document.getElementById('userWelcome').textContent = `Bienvenido, ${userEmail}`;
+                document.getElementById('userEmail').textContent = userEmail;
+            }
+            
+            if (userRole) {
+                document.getElementById('userRole').textContent = userRole;
+            }
+
+            // Verificar token con el backend
+            verifyToken(token);
+        });
+
+        // Función para verificar el token con el backend
+        async function verifyToken(token) {
+            try {
+                const response = await fetch('http://localhost:3000/movie', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (!response.ok) {
+                    // Token inválido o expirado
+                    localStorage.removeItem('authToken');
+                    localStorage.removeItem('userEmail');
+                    localStorage.removeItem('userRole');
+                    alert('⚠️ Sesión expirada. Por favor inicia sesión nuevamente.');
+                    window.location.href = 'login.html';
+                }
+            } catch (error) {
+                console.error('Error verificando token:', error);
+                // En caso de error de conexión, permitir continuar
+            }
+        }
+
+        // Manejar logout
+        document.getElementById('logoutBtn').addEventListener('click', function() {
+            if (confirm('¿Estás seguro de que quieres cerrar sesión?')) {
+                localStorage.removeItem('authToken');
+                localStorage.removeItem('userEmail');
+                localStorage.removeItem('userRole');
+                alert('👋 Sesión cerrada correctamente');
+                window.location.href = 'login.html';
+            }
+        });
+
+        // Proteger todas las páginas del menu
+        const navLinks = document.querySelectorAll('.nav-item');
+        navLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                const token = localStorage.getItem('authToken');
+                if (!token) {
+                    e.preventDefault();
+                    alert('⚠️ Debes iniciar sesión primero');
+                    window.location.href = 'login.html';
+                }
+            });
+        });
+
+        // Verificar token periódicamente (cada 5 minutos)
+        setInterval(() => {
+            const token = localStorage.getItem('authToken');
+            if (token) {
+                verifyToken(token);
+            }
+        }, 300000);
+    </script>
+</body>
+</html>

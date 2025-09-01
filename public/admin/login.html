@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cine Acme - Iniciar Sesión</title>
+    <link rel="stylesheet" href="/public/css/estiloslogin.css">
+</head>
+<body>
+    <!-- Contenido principal con GIF de fondo -->
+    <main>
+        <div class="gif-container">
+            <!-- GIF de fondo -->
+            <img src="/public/videos/mundo.gif" alt="Fondo animado de cine" class="gif-background">
+        </div>
+        <div class="main-content">
+            <!-- Título de la página -->
+            <h1 class="page-title">Cine Acme</h1>
+            <section class="main-section">
+                <h2>Iniciar Sesión</h2>
+                <form id="loginForm" class="login-form">
+                    <div class="form-group">
+                        <label for="email">Correo Electrónico:</label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Contraseña:</label>
+                        <input type="password" id="password" name="password" required>
+                    </div>
+                    <button type="submit" class="cta-button">Acceder</button>
+                </form>
+                <!-- Mensaje y enlace para registrarse -->
+                <p class="register-message">
+                    ¿No estás registrado? Hazlo dando 
+                    <a href="register.html" class="register-link">clic aquí</a>.
+                </p>
+            </section>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-container">
+            <p>&copy; 2025 Cine Acme. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <!-- Script para manejar el login -->
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            try {
+                const response = await fetch('http://localhost:3000/users/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    // ✅ Login exitoso
+                    alert('✅ ' + result.message);
+                    
+                    // Guardar el token en localStorage
+                    localStorage.setItem('authToken', result.token);
+                    localStorage.setItem('userEmail', email);
+                    
+                    // Redirigir a index.html después de 1 segundo
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 1000);
+                    
+                } else {
+                    // ❌ Error en login
+                    alert('❌ ' + result.message);
+                }
+            } catch (error) {
+                alert('🔥 Error de conexión: ' + error.message);
+                console.error('Error en login:', error);
+            }
+        });
+
+        // Opcional: Verificar si ya está logueado al cargar la página
+        window.addEventListener('load', () => {
+            const token = localStorage.getItem('authToken');
+            if (token) {
+                // Si ya tiene token, redirigir directamente
+                window.location.href = 'index.html';
+            }
+        });
+    </script>
+</body>
+</html>

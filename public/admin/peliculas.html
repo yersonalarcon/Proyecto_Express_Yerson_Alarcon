@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cine Acme - Gestión de Películas</title>
+    <link rel="stylesheet" href="/public/css/estilos.peliculas.css">
+</head>
+<body>
+    <!-- Header y Navegación -->
+    <header>
+        <div class="header-container">
+            <h1>Cine Acme</h1>
+            
+            <!-- Menú de usuario -->
+            <div class="user-menu">
+                <span id="userWelcome">Bienvenido</span>
+                <button id="logoutBtn" class="logout-button">Cerrar Sesión</button>
+            </div>
+
+            <nav>
+                <ul class="nav-menu">
+                    <li><a href="index.html" class="nav-item">Inicio</a></li>
+                    <li><a href="usuarios.html" class="nav-item">Usuarios</a></li>
+                    <li><a href="cines.html" class="nav-item">Cines</a></li>
+                    <li><a href="salas.html" class="nav-item">Salas</a></li>
+                    <li><a href="peliculas.html" class="nav-item active">Películas</a></li>
+                    <li><a href="funciones.html" class="nav-item">Funciones</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Modal para crear/editar películas -->
+    <div id="movieModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3 id="modalTitle">Crear Nueva Película</h3>
+            <form id="movieForm">
+                <input type="hidden" id="movieId">
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="code">Código:</label>
+                        <input type="text" id="code" name="code" required 
+                               placeholder="Ej: MOV-001">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="title">Título:</label>
+                        <input type="text" id="title" name="title" required 
+                               placeholder="Ej: Avengers: Endgame">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="synopsis">Sinopsis:</label>
+                    <textarea id="synopsis" name="synopsis" rows="3" required 
+                              placeholder="Breve descripción de la película..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="cast">Reparto (separado por comas):</label>
+                    <input type="text" id="cast" name="cast" 
+                           placeholder="Ej: Robert Downey Jr, Chris Evans, Scarlett Johansson">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="director">Director:</label>
+                        <input type="text" id="director" name="director" 
+                               placeholder="Ej: Anthony Russo">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="genre">Género:</label>
+                        <input type="text" id="genre" name="genre" 
+                               placeholder="Ej: Acción, Ciencia Ficción">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="duration">Duración (minutos):</label>
+                        <input type="number" id="duration" name="duration" 
+                               min="1" required placeholder="Ej: 150">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="classification">Clasificación:</label>
+                        <select id="classification" name="classification">
+                            <option value="">Seleccionar...</option>
+                            <option value="G">G - Todo público</option>
+                            <option value="PG">PG - Guía paternal</option>
+                            <option value="PG-13">PG-13 - Mayores de 13</option>
+                            <option value="R">R - Restringido</option>
+                            <option value="NC-17">NC-17 - Solo adultos</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="language">Idioma:</label>
+                        <input type="text" id="language" name="language" 
+                               placeholder="Ej: Español, Inglés">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="releaseDate">Fecha de Estreno:</label>
+                        <input type="date" id="releaseDate" name="releaseDate" required>
+                    </div>
+                </div>
+
+                <!-- Campos para imagen y tráiler -->
+                <div class="form-group">
+                    <label for="poster">URL del Póster/Imagen:</label>
+                    <input type="url" id="poster" name="poster" 
+                           placeholder="https://ejemplo.com/poster.jpg"
+                           onchange="previewImage(this.value)">
+                    <div id="imagePreview" class="image-preview">
+                        <span>Vista previa</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="trailer">URL del Tráiler (YouTube):</label>
+                    <input type="url" id="trailer" name="trailer" 
+                           placeholder="https://youtube.com/watch?v=..."
+                           onchange="previewTrailer(this.value)">
+                    <div id="trailerPreview" class="trailer-preview">
+                        <span>Vista previa del tráiler</span>
+                    </div>
+                </div>
+
+                <button type="submit" class="cta-button">Guardar Película</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Contenido principal -->
+    <main>
+     <div class="gif-container">
+            <!-- GIF de fondo -->
+            <img src="/public/videos/mundo.gif" alt="Fondo animado de cine" class="gif-background">
+        </div>
+        
+        <div class="main-content">
+            <section class="main-section">
+                <h2>Gestión de Películas</h2>
+                
+                <div class="actions">
+                    <button id="createMovieBtn" class="cta-button">➕ Crear Nueva Película</button>
+                    <div class="search-box">
+                        <input type="text" id="searchInput" placeholder="🔍 Buscar películas...">
+                        <button onclick="searchMovies()">Buscar</button>
+                    </div>
+                </div>
+
+                <div class="loading" id="loading">Cargando películas...</div>
+                <div class="error-message" id="errorMessage" style="display: none;"></div>
+
+                <div class="movies-grid" id="moviesGrid">
+                    <!-- Las películas se cargarán aquí como tarjetas -->
+                </div>
+
+                <!-- Tabla alternativa (comentada por ahora) -->
+                <!-- <table class="data-table" id="moviesTable" style="display: none;">
+                    <thead>
+                        <tr>
+                            <th>Póster</th>
+                            <th>Título</th>
+                            <th>Duración</th>
+                            <th>Género</th>
+                            <th>Estreno</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="moviesBody">
+                    </tbody>
+                </table> -->
+            </section>
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-container">
+            <p>&copy; 2025 Cine Acme. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+   <script>
+    // Variables globales
+    let movies = [];
+    const API_BASE = 'http://localhost:3000/movies';
+    const token = localStorage.getItem('authToken');
+
+    // Verificar autenticación
+    if (!token) {
+        alert('⚠️ Debes iniciar sesión primero');
+        window.location.href = 'login.html';
+    }
+
+    // Elementos DOM
+    const moviesGrid = document.getElementById('moviesGrid');
+    const loading = document.getElementById('loading');
+    const errorMessage = document.getElementById('errorMessage');
+    const modal = document.getElementById('movieModal');
+    const movieForm = document.getElementById('movieForm');
+    const modalTitle = document.getElementById('modalTitle');
+    const createMovieBtn = document.getElementById('createMovieBtn');
+    const closeModal = document.querySelector('.close');
+    const searchInput = document.getElementById('searchInput');
+
+    // Event Listeners
+    document.addEventListener('DOMContentLoaded', function() {
+        loadMovies();
+        setupUserMenu();
+    });
+
+    createMovieBtn.addEventListener('click', () => openModal());
+    closeModal.addEventListener('click', () => closeModalWindow());
+    movieForm.addEventListener('submit', handleFormSubmit);
+    searchInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') searchMovies();
+    });
+
+    // Funciones
+    function setupUserMenu() {
+        const userEmail = localStorage.getItem('userEmail');
+        if (userEmail) {
+            document.getElementById('userWelcome').textContent = `Bienvenido, ${userEmail}`;
+        }
+
+        document.getElementById('logoutBtn').addEventListener('click', function() {
+            if (confirm('¿Estás seguro de que quieres cerrar sesión?')) {
+                localStorage.removeItem('authToken');
+                localStorage.removeItem('userEmail');
+                localStorage.removeItem('userRole');
+                window.location.href = 'login.html';
+            }
+        });
+    }
+
+    // Vista previa de imagen
+    function previewImage(url) {
+        const preview = document.getElementById('imagePreview');
+        if (url && isValidUrl(url)) {
+            preview.innerHTML = `<img src="${url}" alt="Vista previa" onerror="this.style.display='none'">`;
+        } else {
+            preview.innerHTML = '<span>URL inválida</span>';
+        }
+    }
+
+    // Vista previa de tráiler
+    function previewTrailer(url) {
+        const preview = document.getElementById('trailerPreview');
+        if (url && isValidUrl(url)) {
+            const videoId = extractYoutubeId(url);
+            if (videoId) {
+                preview.innerHTML = `
+                    <iframe width="100%" height="200" 
+                            src="https://www.youtube.com/embed/${videoId}" 
+                            frameborder="0" allowfullscreen>
+                    </iframe>`;
+            } else {
+                preview.innerHTML = '<span>URL de YouTube no válida</span>';
+            }
+        } else {
+            preview.innerHTML = '<span>URL inválida</span>';
+        }
+    }
+
+    function extractYoutubeId(url) {
+        const regex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/;
+        const match = url.match(regex);
+        return match ? match[1] : null;
+    }
+
+    function isValidUrl(string) {
+        try {
+            new URL(string);
+            return true;
+        } catch (_) {
+            return false;
+        }
+    }
+
+    async function loadMovies() {
+        try {
+            showLoading();
+            
+            const response = await fetch(API_BASE, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (!response.ok) {
+                if (response.status === 401) {
+                    handleUnauthorized();
+                    return;
+                }
+                throw new Error('Error al cargar películas');
+            }
+
+            const data = await response.json();
+            movies = Array.isArray(data) ? data : (data.movies || []);
+            renderMovies();
+            
+        } catch (error) {
+            showError('Error al cargar películas: ' + error.message);
+        }
+    }
+
+    async function searchMovies() {
+        const query = searchInput.value.trim();
+        if (!query) {
+            loadMovies();
+            return;
+        }
+
+        try {
+            showLoading();
+            const response = await fetch(`${API_BASE}/search?q=${encodeURIComponent(query)}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            const data = await response.json();
+            movies = Array.isArray(data) ? data : (data.movies || []);
+            renderMovies();
+            
+        } catch (error) {
+            showError('Error en búsqueda: ' + error.message);
+        }
+    }
+
+    function renderMovies() {
+        moviesGrid.innerHTML = '';
+        
+        if (movies.length === 0) {
+            moviesGrid.innerHTML = `
+                <div class="no-movies">
+                    <h3>🎬 No hay películas registradas</h3>
+                    <p>Haz clic en "Crear Nueva Película" para comenzar</p>
+                </div>
+            `;
+            hideLoading();
+            return;
+        }
+
+        movies.forEach(movie => {
+            const movieCard = document.createElement('div');
+            movieCard.className = 'movie-card';
+            
+            movieCard.innerHTML = `
+                <div class="movie-poster">
+                    ${movie.poster ? 
+                        `<img src="${movie.poster}" alt="${movie.title}" onerror="this.src='https://via.placeholder.com/300x450/333/fff?text=No+Imagen'">` : 
+                        `<div class="no-poster">🎥</div>`
+                    }
+                </div>
+                <div class="movie-info">
+                    <h3>${movie.title}</h3>
+                    <p class="movie-genre">${movie.genre || 'Sin género'}</p>
+                    <p class="movie-duration">${movie.duration} min</p>
+                    <p class="movie-release">${new Date(movie.releaseDate).toLocaleDateString()}</p>
+                    
+                    <div class="movie-actions">
+                        <button class="action-button edit-button" onclick="editMovie('${movie._id || movie.id}')">
+                            Editar
+                        </button>
+                        <button class="action-button delete-button" onclick="deleteMovie('${movie._id || movie.id}')">
+                            Eliminar
+                        </button>
+                        ${movie.trailer ? `
+                            <button class="action-button trailer-button" onclick="watchTrailer('${movie.trailer}')">
+                                Ver Tráiler
+                            </button>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+            
+            moviesGrid.appendChild(movieCard);
+        });
+
+        hideLoading();
+    }
+
+    function watchTrailer(trailerUrl) {
+        const videoId = extractYoutubeId(trailerUrl);
+        if (videoId) {
+            window.open(`https://www.youtube.com/watch?v=${videoId}`, '_blank');
+        } else {
+            alert('URL de tráiler no válida');
+        }
+    }
+
+    function openModal(movie = null) {
+        if (movie) {
+            modalTitle.textContent = 'Editar Película';
+            document.getElementById('movieId').value = movie._id || movie.id;
+            document.getElementById('code').value = movie.code || '';
+            document.getElementById('title').value = movie.title || '';
+            document.getElementById('synopsis').value = movie.synopsis || '';
+            document.getElementById('cast').value = Array.isArray(movie.cast) ? movie.cast.join(', ') : movie.cast || '';
+            document.getElementById('director').value = movie.director || '';
+            document.getElementById('genre').value = movie.genre || '';
+            document.getElementById('duration').value = movie.duration || '';
+            document.getElementById('classification').value = movie.classification || '';
+            document.getElementById('language').value = movie.language || '';
+            document.getElementById('releaseDate').value = movie.releaseDate ? new Date(movie.releaseDate).toISOString().split('T')[0] : '';
+            document.getElementById('poster').value = movie.poster || '';
+            document.getElementById('trailer').value = movie.trailer || '';
+            
+            // Actualizar vistas previas
+            previewImage(movie.poster || '');
+            previewTrailer(movie.trailer || '');
+        } else {
+            modalTitle.textContent = 'Crear Nueva Película';
+            movieForm.reset();
+            document.getElementById('movieId').value = '';
+            document.getElementById('imagePreview').innerHTML = '<span>Vista previa</span>';
+            document.getElementById('trailerPreview').innerHTML = '<span>Vista previa del tráiler</span>';
+        }
+        modal.style.display = 'block';
+    }
+
+    function closeModalWindow() {
+        modal.style.display = 'none';
+        movieForm.reset();
+        document.getElementById('movieId').value = '';
+        document.getElementById('imagePreview').innerHTML = '<span>Vista previa</span>';
+        document.getElementById('trailerPreview').innerHTML = '<span>Vista previa del tráiler</span>';
+    }
+
+    async function handleFormSubmit(e) {
+        e.preventDefault();
+        
+        const movieId = document.getElementById('movieId').value;
+        const formData = {
+            code: document.getElementById('code').value,
+            title: document.getElementById('title').value,
+            synopsis: document.getElementById('synopsis').value,
+            cast: document.getElementById('cast').value,
+            director: document.getElementById('director').value,
+            genre: document.getElementById('genre').value,
+            duration: parseInt(document.getElementById('duration').value),
+            classification: document.getElementById('classification').value,
+            language: document.getElementById('language').value,
+            releaseDate: document.getElementById('releaseDate').value,
+            poster: document.getElementById('poster').value,
+            trailer: document.getElementById('trailer').value
+        };
+
+        try {
+            const url = movieId ? `${API_BASE}/${movieId}` : API_BASE;
+            const method = movieId ? 'PUT' : 'POST';
+
+            const response = await fetch(url, {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(formData)
+            });
+
+            const result = await response.json();
+
+            if (!response.ok) {
+                throw new Error(result.message || 'Error al guardar');
+            }
+
+            alert(movieId ? '✅ Película actualizada' : '✅ Película creada');
+            closeModalWindow();
+            loadMovies();
+
+        } catch (error) {
+            alert('❌ Error: ' + error.message);
+        }
+    }
+
+    function editMovie(id) {
+        const movie = movies.find(m => (m._id === id) || (m.id === id));
+        if (movie) {
+            openModal(movie);
+        } else {
+            alert('❌ No se encontró la película para editar');
+        }
+    }
+
+    async function deleteMovie(id) {
+        if (!confirm('¿Estás seguro de que quieres eliminar esta película?')) {
+            return;
+        }
+
+        try {
+            const response = await fetch(`${API_BASE}/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            const result = await response.json();
+
+            if (!response.ok) {
+                throw new Error(result.message || 'Error al eliminar');
+            }
+
+            alert('✅ Película eliminada');
+            loadMovies();
+
+        } catch (error) {
+            alert('❌ Error: ' + error.message);
+        }
+    }
+
+    function handleUnauthorized() {
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('userEmail');
+        localStorage.removeItem('userRole');
+        alert('⚠️ Sesión expirada. Por favor inicia sesión nuevamente.');
+        window.location.href = 'login.html';
+    }
+
+    function showLoading() {
+        loading.style.display = 'block';
+        loading.textContent = 'Cargando películas...';
+        moviesGrid.style.display = 'none';
+    }
+
+    function hideLoading() {
+        loading.style.display = 'none';
+        moviesGrid.style.display = 'grid';
+    }
+
+    function showError(message) {
+        errorMessage.textContent = message;
+        errorMessage.style.display = 'block';
+        loading.style.display = 'none';
+        moviesGrid.style.display = 'none';
+    }
+
+    // Hacer funciones globales
+    window.editMovie = editMovie;
+    window.deleteMovie = deleteMovie;
+    window.watchTrailer = watchTrailer;
+    window.searchMovies = searchMovies;
+    window.previewImage = previewImage;
+    window.previewTrailer = previewTrailer;
+
+    // Cerrar modal al hacer clic fuera
+    window.addEventListener('click', function(event) {
+        if (event.target === modal) {
+            closeModalWindow();
+        }
+    });
+</script>
+</body>
+</html>

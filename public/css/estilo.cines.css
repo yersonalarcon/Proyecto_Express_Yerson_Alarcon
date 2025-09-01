@@ -1,0 +1,518 @@
+  :root {
+            --primary-color: #6a5acd;
+            --secondary-color: #483d8b;
+            --accent-color: #8a2be2;
+            --text-light: #f4f4f4;
+            --text-dark: #333;
+            --bg-dark: #1a1a2e;
+            --card-bg: rgba(255, 255, 255, 0.1);
+            --border-color: rgba(255, 255, 255, 0.2);
+            --gradient-bg: linear-gradient(135deg, var(--secondary-color) 0%, var(--primary-color) 100%);
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        html, body {
+            height: 100%;
+            font-family: 'Inter', sans-serif;
+            color: var(--text-light);
+            background-color: var(--bg-dark);
+        }
+        
+        /* ---------------------------------- */
+        /* Layout Principal                   */
+        /* ---------------------------------- */
+        body {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        header {
+            background: var(--bg-dark);
+            padding: 20px 40px;
+            box-shadow: var(--shadow);
+            z-index: 100;
+        }
+        
+        .header-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header h1 {
+            font-size: 2em;
+            font-weight: 700;
+            color: var(--text-light);
+            letter-spacing: -1px;
+            cursor: pointer;
+        }
+        
+        main {
+            flex-grow: 1;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px 20px;
+        }
+        
+        /* ---------------------------------- */
+        /* Contenedor del GIF                 */
+        /* ---------------------------------- */
+        .gif-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 0;
+        }
+        
+        .gif-background {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: brightness(40%);
+        }
+        
+        .main-content {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            backdrop-filter: blur(15px);
+            border-radius: 12px;
+            padding: 40px;
+            max-width: 1000px;
+            width: 100%;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            animation: fadeIn 1s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .main-content h2 {
+            font-size: 2.5em;
+            font-weight: 600;
+            color: var(--text-light);
+            margin-bottom: 20px;
+        }
+        
+        .main-content p {
+            font-size: 1.1em;
+            line-height: 1.6;
+            margin-bottom: 25px;
+            color: var(--text-light);
+        }
+        
+        footer {
+            background: var(--bg-dark);
+            padding: 20px;
+            text-align: center;
+            font-size: 0.9em;
+            color: var(--text-light);
+            box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* ---------------------------------- */
+        /* Navegación                         */
+        /* ---------------------------------- */
+        nav {
+            margin-top: 20px;
+            width: 100%;
+        }
+        
+        .nav-menu {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            list-style: none;
+            flex-wrap: wrap;
+        }
+        
+        .nav-item {
+            color: var(--text-light);
+            text-decoration: none;
+            font-weight: 600;
+            padding: 8px 15px;
+            border-radius: 6px;
+            transition: background 0.3s ease, transform 0.2s ease;
+        }
+        
+        .nav-item.active {
+            background: var(--secondary-color);
+        }
+        
+        .nav-item:hover {
+            background: var(--secondary-color);
+            transform: translateY(-2px);
+        }
+        
+        /* ---------------------------------- */
+        /* Botones & CTA                      */
+        /* ---------------------------------- */
+        .logout-button {
+            background: #ff4757;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            transition: background 0.3s ease, transform 0.2s ease;
+        }
+        
+        .logout-button:hover {
+            background: #e63946;
+            transform: scale(1.05);
+        }
+        
+        .cta-button {
+            display: inline-block;
+            background: var(--gradient-bg);
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            padding: 12px 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .actions {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .action-button {
+            background: none;
+            border: none;
+            color: var(--text-light);
+            cursor: pointer;
+            font-size: 0.9em;
+            padding: 5px 10px;
+            border-radius: 4px;
+            transition: background 0.3s, transform 0.2s;
+        }
+        
+        .edit-button {
+            background: var(--primary-color);
+        }
+        
+        .edit-button:hover {
+            background: #5d4aa0;
+        }
+        
+        .delete-button {
+            background: #ff4757;
+        }
+        
+        .delete-button:hover {
+            background: #e63946;
+        }
+        
+        /* ---------------------------------- */
+        /* Tablas de Datos                    */
+        /* ---------------------------------- */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .data-table thead {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .data-table th, .data-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .data-table th {
+            font-weight: 700;
+            color: var(--text-light);
+        }
+        
+        .data-table tbody tr:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        /* ---------------------------------- */
+        /* Modales & Formularios              */
+        /* ---------------------------------- */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background: var(--bg-dark);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 30px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            animation: modalSlideDown 0.4s ease-out;
+            position: relative;
+        }
+        
+        @keyframes modalSlideDown {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        .modal-content h3 {
+            font-size: 2em;
+            margin-bottom: 20px;
+            text-align: center;
+            color: var(--text-light);
+        }
+        
+        .close {
+            color: var(--text-light);
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+        
+        .close:hover {
+            color: #ff4757;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-light);
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-light);
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(106, 90, 205, 0.5);
+        }
+        
+        /* Modal de Mensajes Personalizado */
+        #messageModal .modal-content {
+            text-align: center;
+        }
+        
+        #messageModal h3 {
+            font-size: 1.8em;
+            color: var(--accent-color);
+        }
+        
+        #messageModal p {
+            font-size: 1.1em;
+            margin-bottom: 20px;
+        }
+        
+        .modal-actions {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+        
+        .modal-actions button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+        
+        .modal-actions .confirm-btn {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .modal-actions .cancel-btn {
+            background-color: #ff4757;
+            color: white;
+        }
+        
+        .modal-actions .ok-btn {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .loading, .error-message {
+            text-align: center;
+            padding: 20px;
+            font-size: 1.2em;
+            font-weight: 600;
+            color: var(--accent-color);
+        }
+        
+        .error-message {
+            color: #ff4757;
+        }
+        
+         #cinemaFilter, #cinemaId {
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="white" viewBox="0 0 16 16"><path d="M7.247 11.14 2.451 6.884A.625.625 0 0 1 7.247 11.14Z"/></svg>');
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            background-size: 16px;
+        }
+        #cinemaFilter:hover {
+            background: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        }
+        #cinemaFilter option {
+            background-color: #222;
+            color: white;
+        }
+         #cinemaId option{
+            background-color: #222;
+            color: white;
+        }
+        /* ---------------------------------- */
+        /* Media Queries                      */
+        /* ---------------------------------- */
+        @media (max-width: 900px) {
+            header h1 {
+                font-size: 1.5em;
+            }
+        
+            .user-menu {
+                position: static;
+                margin-top: 15px;
+                width: 100%;
+                justify-content: center;
+                flex-direction: column;
+            }
+        
+            nav {
+                margin-top: 15px;
+            }
+        
+            .nav-menu {
+                gap: 10px;
+            }
+        
+            .main-content {
+                padding: 30px;
+            }
+        
+            .main-content h2 {
+                font-size: 2em;
+            }
+        }
+        
+        @media (max-width: 600px) {
+            header {
+                padding: 15px 20px;
+            }
+        
+            .header-container {
+                flex-direction: column;
+                align-items: center;
+            }
+        
+            nav {
+                margin-top: 10px;
+            }
+        
+            .nav-menu {
+                flex-direction: column;
+                gap: 5px;
+            }
+        
+            .nav-item {
+                padding: 6px 10px;
+            }
+        
+            .main-content {
+                padding: 20px;
+            }
+        
+            .main-content h2 {
+                font-size: 1.5em;
+            }
+        
+            .main-content p {
+                font-size: 1em;
+            }
+        
+            .logout-button, .cta-button {
+                padding: 8px 15px;
+            }
+        }

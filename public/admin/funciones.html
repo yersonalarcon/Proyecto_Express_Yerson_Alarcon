@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cine Acme - Gestión de Funciones</title>
+    <link rel="stylesheet" href="/public/css/estilos.peliculas.css" />
+    <style>
+      /* Estilos básicos para que funcione el modal y las tarjetas */
+      .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+      }
+
+      .modal-content {
+        background-color: var(--bg-dark);
+        margin: 10% auto;
+        padding: 20px;
+        border-radius: 8px;
+        width: 80%;
+        max-width: 600px;
+      }
+
+      .close {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+      }
+
+      .function-card {
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 15px;
+        margin: 10px 0;
+        background-color: (var(--gradient-bg));
+      }
+
+      .function-actions {
+        margin-top: 15px;
+      }
+
+      .action-button {
+        padding: 5px 10px;
+        margin-right: 10px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+
+      .edit-button {
+        background-color: var(--primary-color);
+        color: white;
+      }
+
+      .delete-button {
+        background-color: #f44336;
+        color: white;
+      }
+
+      .cta-button {
+        background-color: #2196f3;
+        color: white;
+        padding: 10px 15px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+
+      .form-group {
+        margin-bottom: 15px;
+      }
+
+      .form-row {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 15px;
+      }
+
+      .form-row .form-group {
+        flex: 1;
+      }
+
+      label {
+        display: block;
+        margin-bottom: 5px;
+      }
+
+      select,
+      input[type="date"],
+      input[type="time"] {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+      }
+
+      .loading {
+        text-align: center;
+        padding: 20px;
+      }
+
+      .error-message {
+        color: #f44336;
+        padding: 10px;
+        background-color: #ffebee;
+        border-radius: 4px;
+        margin: 10px 0;
+      }
+
+      .filters {
+        display: flex;
+        gap: 15px;
+        margin: 15px 0;
+        flex-wrap: wrap;
+      }
+
+      .filter-group {
+        flex: 1;
+        min-width: 150px;
+      }
+
+      .functions-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 20px;
+        margin-top: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Header y Navegación -->
+    <header>
+      <div class="header-container">
+        <h1>Cine Acme</h1>
+
+        <!-- Menú de usuario -->
+        <div class="user-menu">
+          <span id="userWelcome">Bienvenido</span>
+          <button id="logoutBtn" class="logout-button">Cerrar Sesión</button>
+        </div>
+
+        <nav>
+          <ul class="nav-menu">
+            <li><a href="index.html" class="nav-item">Inicio</a></li>
+            <li><a href="usuarios.html" class="nav-item">Usuarios</a></li>
+            <li><a href="cines.html" class="nav-item">Cines</a></li>
+            <li><a href="salas.html" class="nav-item">Salas</a></li>
+            <li><a href="peliculas.html" class="nav-item">Películas</a></li>
+            <li>
+              <a href="funciones.html" class="nav-item active">Funciones</a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <!-- Modal para crear/editar funciones -->
+    <div id="functionModal" class="modal">
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <h3 id="modalTitle">Crear Nueva Función</h3>
+        <form id="functionForm">
+          <input type="hidden" id="functionId" />
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="cinemaId">Cine:</label>
+              <select id="cinemaId" name="cinemaId" required>
+                <option value="">Seleccionar cine...</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="roomId">Sala:</label>
+              <select id="roomId" name="roomId" required>
+                <option value="">Seleccionar sala...</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="movieId">Película:</label>
+              <select id="movieId" name="movieId" required>
+                <option value="">Seleccionar película...</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="date">Fecha:</label>
+              <input
+                type="date"
+                id="date"
+                name="date"
+                required
+                min="<?php echo date('Y-m-d'); ?>"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="startTime">Hora de Inicio:</label>
+              <input type="time" id="startTime" name="startTime" required />
+            </div>
+          </div>
+
+          <button type="submit" class="cta-button">Guardar Función</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Contenido principal -->
+    <main>
+      <div class="gif-container">
+        <img
+          src="/public/videos/mundo.gif"
+          alt="Fondo animado"
+          class="gif-background"
+        />
+      </div>
+
+      <div class="main-content">
+        <section class="main-section">
+          <h2>Gestión de Funciones</h2>
+
+          <div class="actions">
+            <button id="createFunctionBtn" class="cta-button">
+              ➕ Crear Nueva Función
+            </button>
+
+            <div class="filters">
+              <div class="filter-group">
+                <label for="filterCinema">Filtrar por Cine:</label>
+                <select id="filterCinema">
+                  <option value="">Todos los cines</option>
+                </select>
+              </div>
+
+              <div class="filter-group">
+                <label for="filterDate">Filtrar por Fecha:</label>
+                <input type="date" id="filterDate" />
+              </div>
+
+              <div class="filter-group">
+                <label for="filterMovie">Filtrar por Película:</label>
+                <select id="filterMovie">
+                  <option value="">Todas las películas</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="loading" id="loading">Cargando funciones...</div>
+          <div
+            class="error-message"
+            id="errorMessage"
+            style="display: none"
+          ></div>
+
+          <div class="functions-grid" id="functionsGrid">
+            <!-- Las funciones se cargarán aquí como tarjetas -->
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <footer>
+      <div class="footer-container">
+        <p>&copy; 2025 Cine Acme. Todos los derechos reservados.</p>
+      </div>
+    </footer>
+
+  <script>
+    // Variables globales
+    let functions = [];
+    let cinemas = [];
+    let rooms = [];
+    let movies = [];
+    const API_BASE = "http://localhost:3000/functions";
+    const CINEMAS_API = "http://localhost:3000/cinemas";
+    const ROOMS_API = "http://localhost:3000/rooms";
+    const MOVIES_API = "http://localhost:3000/movies";
+    const token = localStorage.getItem("authToken");
+
+    // Verificar autenticación
+    if (!token) {
+        alert("⚠️ Debes iniciar sesión primero");
+        window.location.href = "login.html";
+    }
+
+    // Elementos DOM
+    const functionsGrid = document.getElementById("functionsGrid");
+    const loading = document.getElementById("loading");
+    const errorMessage = document.getElementById("errorMessage");
+    const modal = document.getElementById("functionModal");
+    const functionForm = document.getElementById("functionForm");
+    const modalTitle = document.getElementById("modalTitle");
+    const createFunctionBtn = document.getElementById("createFunctionBtn");
+    const closeModal = document.querySelector(".close");
+    const cinemaSelect = document.getElementById("cinemaId");
+    const roomSelect = document.getElementById("roomId");
+    const movieSelect = document.getElementById("movieId");
+    const filterCinema = document.getElementById("filterCinema");
+    const filterDate = document.getElementById("filterDate");
+    const filterMovie = document.getElementById("filterMovie");
+
+    // Funciones de utilidad (definirlas primero)
+    function showLoading() {
+        loading.style.display = "block";
+        functionsGrid.style.display = "none";
+        errorMessage.style.display = "none";
+    }
+
+    function hideLoading() {
+        loading.style.display = "none";
+        functionsGrid.style.display = "grid";
+    }
+
+    function showError(message) {
+        errorMessage.textContent = message;
+        errorMessage.style.display = "block";
+        loading.style.display = "none";
+    }
+
+    function populateSelect(selectElement, data, defaultOptionText) {
+        const currentValue = selectElement.value;
+        const firstOption = selectElement.options[0];
+        selectElement.innerHTML = "";
+        const defaultOption = document.createElement("option");
+        defaultOption.value = "";
+        defaultOption.textContent = defaultOptionText;
+        selectElement.appendChild(defaultOption);
+        data.forEach((item) => {
+            const option = document.createElement("option");
+            option.value = item._id;
+            option.textContent = item.name || item.title || item.code;
+            selectElement.appendChild(option);
+        });
+        if (currentValue && data.some((item) => item._id === currentValue)) {
+            selectElement.value = currentValue;
+        }
+    }
+
+    function setupUserMenu() {
+        const userWelcome = document.getElementById("userWelcome");
+        const logoutBtn = document.getElementById("logoutBtn");
+        const userData = localStorage.getItem("userData");
+        if (userData) {
+            const user = JSON.parse(userData);
+            userWelcome.textContent = `Bienvenido, ${user.name || user.email}`;
+        }
+        logoutBtn.addEventListener("click", () => {
+            localStorage.removeItem("authToken");
+            localStorage.removeItem("userData");
+            window.location.href = "login.html";
+        });
+    }
+
+    function openModal() {
+        modal.style.display = "block";
+        functionForm.reset();
+        document.getElementById("functionId").value = "";
+        modalTitle.textContent = "Crear Nueva Función";
+        // Limpiar y resetear el select de salas
+        roomSelect.innerHTML = '<option value="">Seleccionar sala...</option>';
+    }
+
+    function closeModalWindow() {
+        modal.style.display = "none";
+    }
+
+    function applyFilters() {
+        const cinemaId = filterCinema.value;
+        const date = filterDate.value;
+        const movieId = filterMovie.value;
+        
+        return functions.filter((func) => {
+            const matchCinema = !cinemaId || func.cinema?._id === cinemaId;
+            const matchDate = !date || func.date === date;
+            const matchMovie = !movieId || func.movie?._id === movieId;
+            return matchCinema && matchDate && matchMovie;
+        });
+    }
+
+    // Funciones principales
+    async function loadInitialData() {
+        try {
+            showLoading();
+            await Promise.all([
+                loadCinemas(),
+                loadRooms(),
+                loadMovies(),
+                loadFunctions(),
+            ]);
+            hideLoading();
+        } catch (error) {
+            showError("Error al cargar datos iniciales: " + error.message);
+        }
+    }
+
+    async function loadCinemas() {
+        try {
+            const response = await fetch(CINEMAS_API, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            cinemas = await response.json();
+            populateSelect(cinemaSelect, cinemas, "Seleccionar cine...");
+            populateSelect(filterCinema, cinemas, "Todos los cines");
+        } catch (error) {
+            console.error("Error loading cinemas:", error);
+            showError("Error al cargar cines: " + error.message);
+        }
+    }
+
+    async function loadRooms() {
+        try {
+            const response = await fetch(ROOMS_API, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            if (!response.ok) {
+                throw new Error("Error loading all rooms");
+            }
+            rooms = await response.json();
+        } catch (error) {
+            console.error("Error loading all rooms:", error);
+            showError("Error al cargar todas las salas: " + error.message);
+        }
+    }
+
+    function updateRoomsForCinema() {
+        const cinemaId = cinemaSelect.value;
+        const filteredRooms = cinemaId
+            ? rooms.filter(
+                (room) =>
+                    String(room.cinemaId) === String(cinemaId) ||
+                    (room.cinema && String(room.cinema._id) === String(cinemaId))
+            )
+            : [];
+
+        populateSelect(roomSelect, filteredRooms, "Seleccionar sala...");
+    }
+
+    async function loadMovies() {
+        try {
+            const response = await fetch(MOVIES_API, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            movies = await response.json();
+            populateSelect(movieSelect, movies, "Seleccionar película...");
+            populateSelect(filterMovie, movies, "Todas las películas");
+        } catch (error) {
+            console.error("Error loading movies:", error);
+            showError("Error al cargar películas: " + error.message);
+        }
+    }
+
+    async function loadFunctions() {
+        try {
+            const response = await fetch(API_BASE, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            functions = await response.json();
+            renderFunctions();
+        } catch (error) {
+            showError("Error al cargar funciones: " + error.message);
+        }
+    }
+
+    function renderFunctions() {
+        functionsGrid.innerHTML = "";
+        const filteredFunctions = applyFilters();
+        
+        if (filteredFunctions.length === 0) {
+            functionsGrid.innerHTML = `
+                <div class="no-functions">
+                    <h3>🎬 No hay funciones programadas</h3>
+                    <p>Haz clic en "Crear Nueva Función" para comenzar</p>
+                </div>
+            `;
+            return;
+        }
+        
+        filteredFunctions.forEach((func) => {
+            const functionCard = document.createElement("div");
+            functionCard.className = "function-card";
+            functionCard.innerHTML = `
+                <div class="function-header">
+                    <h3>${func.movie?.title || "Película"}</h3>
+                    <span class="function-time">${func.startTime}</span>
+                </div>
+                <div class="function-details">
+                    <p class="function-detail"><strong>Cine:</strong> ${func.cinema?.name || "N/A"}</p>
+                    <p class="function-detail"><strong>Sala:</strong> ${func.room?.code || "N/A"}</p>
+                    <p class="function-detail"><strong>Fecha:</strong> ${func.date}</p>
+                    <p class="function-detail"><strong>Duración:</strong> ${func.duration || func.movie?.duration || 'N/A'} min</p>
+                    <p class="function-detail"><strong>Hora fin:</strong> ${func.endTime || 'N/A'}</p>
+                </div>
+                <div class="function-actions">
+                    <button class="action-button edit-button" onclick="editFunction('${func._id}')">Editar</button>
+                    <button class="action-button delete-button" onclick="deleteFunction('${func._id}')">Eliminar</button>
+                </div>
+            `;
+            functionsGrid.appendChild(functionCard);
+        });
+    }
+
+    function filterFunctions() {
+        const filtered = applyFilters();
+        renderFilteredFunctions(filtered);
+        return filtered;
+    }
+
+    function renderFilteredFunctions(filteredFunctions) {
+        functionsGrid.innerHTML = "";
+        
+        if (filteredFunctions.length === 0) {
+            functionsGrid.innerHTML = `
+                <div class="no-functions">
+                    <h3>🔍 No se encontraron funciones con estos filtros</h3>
+                    <p>Intenta con otros criterios de búsqueda</p>
+                </div>
+            `;
+            return;
+        }
+        
+        filteredFunctions.forEach((func) => {
+            const functionCard = document.createElement("div");
+            functionCard.className = "function-card";
+            functionCard.innerHTML = `
+                <div class="function-header">
+                    <h3>${func.movie?.title || "Película"}</h3>
+                    <span class="function-time">${func.startTime}</span>
+                </div>
+                <div class="function-details">
+                    <p class="function-detail"><strong>Cine:</strong> ${func.cinema?.name || "N/A"}</p>
+                    <p class="function-detail"><strong>Sala:</strong> ${func.room?.code || "N/A"}</p>
+                    <p class="function-detail"><strong>Fecha:</strong> ${func.date}</p>
+                    <p class="function-detail"><strong>Duración:</strong> ${func.duration || func.movie?.duration || 'N/A'} min</p>
+                    <p class="function-detail"><strong>Hora fin:</strong> ${func.endTime || 'N/A'}</p>
+                </div>
+                <div class="function-actions">
+                    <button class="action-button edit-button" onclick="editFunction('${func._id}')">Editar</button>
+                    <button class="action-button delete-button" onclick="deleteFunction('${func._id}')">Eliminar</button>
+                </div>
+            `;
+            functionsGrid.appendChild(functionCard);
+        });
+    }
+
+    async function handleFormSubmit(e) {
+        e.preventDefault();
+        const functionId = document.getElementById("functionId").value;
+        const formData = new FormData(functionForm);
+        
+        // Obtener la película para la duración
+        const movieId = formData.get("movieId");
+        const movie = movies.find(m => m._id === movieId);
+        
+        const functionData = {
+            cinemaId: formData.get("cinemaId"),
+            roomId: formData.get("roomId"),
+            movieId: movieId,
+            date: formData.get("date"),
+            startTime: formData.get("startTime"),
+            duration: movie?.duration || 120
+        };
+
+        try {
+            showLoading();
+            const url = functionId ? `${API_BASE}/${functionId}` : API_BASE;
+            const method = functionId ? "PUT" : "POST";
+            
+            const response = await fetch(url, {
+                method: method,
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify(functionData),
+            });
+            
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || "Error al guardar la función");
+            }
+            
+            closeModalWindow();
+            await loadFunctions();
+            hideLoading();
+            alert("Función guardada exitosamente");
+        } catch (error) {
+            showError("Error al guardar la función: " + error.message);
+            hideLoading();
+        }
+    }
+
+    async function editFunction(id) {
+        try {
+            showLoading();
+            const response = await fetch(`${API_BASE}/${id}`, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            if (!response.ok) {
+                throw new Error("Error al cargar la función");
+            }
+            const func = await response.json();
+            document.getElementById("functionId").value = func._id;
+            document.getElementById("cinemaId").value = func.cinemaId;
+
+            // Cargar salas para el cine seleccionado
+            updateRoomsForCinema();
+
+            // Esperar un momento para que se carguen las salas antes de seleccionar
+            setTimeout(() => {
+                document.getElementById("roomId").value = func.roomId;
+                document.getElementById("movieId").value = func.movieId;
+                document.getElementById("date").value = func.date;
+                document.getElementById("startTime").value = func.startTime;
+                modalTitle.textContent = "Editar Función";
+                modal.style.display = "block";
+                hideLoading();
+            }, 100);
+        } catch (error) {
+            showError("Error al cargar la función: " + error.message);
+            hideLoading();
+        }
+    }
+
+    async function deleteFunction(id) {
+        if (!confirm("¿Estás seguro de que deseas eliminar esta función?")) {
+            return;
+        }
+        try {
+            showLoading();
+            const response = await fetch(`${API_BASE}/${id}`, {
+                method: "DELETE",
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            if (!response.ok) {
+                throw new Error("Error al eliminar la función");
+            }
+            await loadFunctions();
+            hideLoading();
+            alert("Función eliminada exitosamente");
+        } catch (error) {
+            showError("Error al eliminar la función: " + error.message);
+            hideLoading();
+        }
+    }
+
+    // Event Listeners (al final, después de definir todas las funciones)
+    document.addEventListener("DOMContentLoaded", function () {
+        loadInitialData();
+        setupUserMenu();
+    });
+
+    createFunctionBtn.addEventListener("click", () => openModal());
+    closeModal.addEventListener("click", () => closeModalWindow());
+    functionForm.addEventListener("submit", handleFormSubmit);
+    filterCinema.addEventListener("change", () => filterFunctions());
+    filterDate.addEventListener("change", () => filterFunctions());
+    filterMovie.addEventListener("change", () => filterFunctions());
+    cinemaSelect.addEventListener("change", updateRoomsForCinema);
+
+    window.addEventListener("click", (event) => {
+        if (event.target === modal) {
+            closeModalWindow();
+        }
+    });
+
+    // Hacer funciones disponibles globalmente para los onclick
+    window.editFunction = editFunction;
+    window.deleteFunction = deleteFunction;
+
+</script>
+  </body>
+</html>
