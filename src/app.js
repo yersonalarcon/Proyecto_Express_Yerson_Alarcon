@@ -8,6 +8,7 @@ import cors from 'cors'
 import roomRouter from './routes/room.route.js';
 import movieRouter from './routes/movie.route.js';
 import functionRouter from './routes/function.route.js';
+import confiteriaRouter from './routes/confiteria.route.js';
 
 
 const server = express();
@@ -24,7 +25,6 @@ const client = new MongoClient('mongodb://localhost:27017');
 await client.connect();
 export const db = client.db('CineAcmeDb');
 
-// ✅ Pasa solo la db al router
 server.use('/users', usersRouter(db));
 
 server.use('/cinemas', verifyToken, cinemaRouter(db));
@@ -34,6 +34,8 @@ server.use('/rooms', verifyToken, roomRouter(db));
 server.use('/movies', verifyToken, movieRouter(db));
 
 server.use('/functions', verifyToken, functionRouter(db));
+
+server.use('/confiteria', confiteriaRouter(db));
 
 server.listen(
     {
