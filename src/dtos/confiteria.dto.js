@@ -25,4 +25,22 @@ export class ConfiteriaDto{
         }
         return errors;
     }
+    isValidUrl(string) {
+        try {
+            new URL(string);
+            return true;
+        } catch (_) {
+            return false;
+        }
+    }
+
+    toJSON() {
+        return {
+            code: this.code,
+            nombre: this.nombre,
+            descripcion: this.descripcion,
+            imagen: this.imagen,
+            price:this.price
+        };
+    }
 };

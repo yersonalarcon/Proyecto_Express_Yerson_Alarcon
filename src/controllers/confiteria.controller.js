@@ -1,4 +1,4 @@
-import {ConfiteriaDto } from "../dtos/confiteria.js";
+import {ConfiteriaDto}  from "../dtos/confiteria.dto.js";
 
 export default class ConfiteriaController {
     constructor(confiteriamodel) {
@@ -7,8 +7,8 @@ export default class ConfiteriaController {
 
     async create(confiteriaData) {
         try {
-            const ConfiteriaDto = new ConfiteriaDto(confiteriaData);
-            const validationErrors = ConfiteriaDto.validate();
+            const confiteriaDto = new ConfiteriaDto(confiteriaData);
+            const validationErrors = confiteriaDto.validate();
 
             if (validationErrors.length > 0) {
                 return {
@@ -65,8 +65,8 @@ export default class ConfiteriaController {
 
     async update(id, data) {
         try {
-            const ConfiteriaDto = new ConfitiriaDto(data);
-            const validationErrors = ConfiteriaDto.validate();
+            const confiteriaDto = new ConfitiriaDto(data);
+            const validationErrors = confiteriaDto.validate();
 
             if (validationErrors.length > 0) {
                 return {

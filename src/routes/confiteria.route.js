@@ -18,7 +18,7 @@ export default function confiteriaRouter(db) {
         body('precio').isInt({ min: 1 }).withMessage('El precio  debe ser mayor a 0'),
     ];
 
-    route.get('/', async (req, res) => {
+    route.get('/', verifyToken, async (req, res) => {
         try {
             const result = await ConfiteriaController.getAll();
             if (result.error) {
@@ -33,7 +33,7 @@ export default function confiteriaRouter(db) {
         }
     });
 
-    route.get('/search', async (req, res) => {
+    route.get('/search', verifyToken, async (req, res) => {
         try {
             const { q } = req.query;
             if (!q) {
@@ -53,7 +53,7 @@ export default function confiteriaRouter(db) {
         }
     });
 
-    route.get('/:id', async (req, res) => {
+    route.get('/:id', verifyToken, async (req, res) => {
         try {
             const { id } = req.params;
             const result = await confiteriaController.getById(id);
@@ -70,7 +70,7 @@ export default function confiteriaRouter(db) {
         }
     });
 
-    route.post('/', confiteriaValidator, async (req, res) => {
+    route.post('/', verifyToken, confiteriaValidator, async (req, res) => {
         try {
             const errors = validationResult(req);
             if (!errors.isEmpty()) {
@@ -92,7 +92,7 @@ export default function confiteriaRouter(db) {
         }
     });
 
-    route.put('/:id', confiteriaValidator, async (req, res) => {
+    route.put('/:id', verifyToken, confiteriaValidator, async (req, res) => {
         try {
             const errors = validationResult(req);
             if (!errors.isEmpty()) {
@@ -115,7 +115,7 @@ export default function confiteriaRouter(db) {
         }
     });
 
-    route.delete('/:id', async (req, res) => {
+    route.delete('/:id', verifyToken, async (req, res) => {
         try {
             const { id } = req.params;
             const result = await confiteriaController.delete(id);
