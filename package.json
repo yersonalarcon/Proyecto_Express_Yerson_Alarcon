@@ -2,6 +2,14 @@
   "name": "yerson",
   "version": "1.0.0",
   "description": "",
+  "homepage": "https://github.com/yersonalarcon/Proyecto_Express_Yerson_Alarcon#readme",
+  "bugs": {
+    "url": "https://github.com/yersonalarcon/Proyecto_Express_Yerson_Alarcon/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yersonalarcon/Proyecto_Express_Yerson_Alarcon.git"
+  },
   "license": "ISC",
   "author": "yersonalarcon",
   "type": "module",
@@ -21,15 +29,7 @@
     "semver": "^7.7.2"
   },
   "devDependencies": {
-    "dotenv": "^17.2.1",
+    "dotenv": "^17.2.2",
     "nodemon": "^3.1.10"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/yersonalarcon/Proyecto_Express_Yerson_Alarcon.git"
-  },
-  "bugs": {
-    "url": "https://github.com/yersonalarcon/Proyecto_Express_Yerson_Alarcon/issues"
-  },
-  "homepage": "https://github.com/yersonalarcon/Proyecto_Express_Yerson_Alarcon#readme"
+  }
 }
